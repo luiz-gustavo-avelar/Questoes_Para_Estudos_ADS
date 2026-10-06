@@ -21,45 +21,36 @@
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
             width: 90%;
-            max-width: 600px;
+            max-width: 650px;
             text-align: center;
             border: 1px solid #333333;
-            transition: all 0.3s ease;
         }
         h2 {
-            font-size: 22px;
+            font-size: 20px;
             margin-bottom: 20px;
             color: #FFFFFF;
+            line-height: 1.4;
         }
-        input[type="text"] {
-            width: 80%;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background: #222;
-            color: #FFF;
-            margin-bottom: 15px;
-            text-align: center;
+        .opcoes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-        button {
-            background: #007bff;
+        .btn-opcao {
+            background: #222222;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            margin: 5px;
+            border: 1px solid #444;
+            padding: 12px 15px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background 0.2s;
+            font-size: 15px;
+            text-align: left;
+            transition: all 0.2s;
         }
-        button:hover {
-            background: #0056b3;
+        .btn-opcao:hover:not(:disabled) {
+            background: #333333;
+            border-color: #007bff;
         }
         .dica-container {
             margin-top: 15px;
@@ -72,11 +63,11 @@
             text-align: left;
         }
         .feedback {
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 15px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             text-align: left;
         }
         .correto {
@@ -94,6 +85,7 @@
             color: #CCCCCC;
             margin-top: 8px;
             font-weight: normal;
+            line-height: 1.4;
         }
         .contador {
             font-size: 13px;
@@ -101,6 +93,22 @@
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+        #btn-proximo {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        #btn-proximo:hover {
+            background: #0056b3;
         }
     </style>
 </head>
@@ -112,243 +120,440 @@
     
     <div id="dica-box" class="dica-container"></div>
 
-    <div id="input-area" style="margin-top: 20px;">
-        <input type="text" id="resposta-usuario" placeholder="Digite sua resposta curta..." autocomplete="off">
-        <br>
-        <button onclick="verificarResposta()">Responder</button>
-    </div>
+    <div class="opcoes-container" id="opcoes-area"></div>
 
     <div id="feedback-area"></div>
-    <button id="btn-proximo" style="display:none; width: 100%; margin-top: 20px;" onclick="proximaPergunta()">Próxima Pergunta >></button>
+    <button id="btn-proximo" style="display:none;" onclick="proximaPergunta()">Próxima Pergunta >></button>
 </div>
 
 <script>
     const perguntas = [
         {
             pergunta: "O que é a ISO/IEC 27001?",
-            resposta: "estabelece requisitos para um sgsi",
-            exibicaoResposta: "É uma norma que estabelece requisitos para implementar, manter e melhorar continuamente um Sistema de Gestão de Segurança da Informação (SGSI).",
-            dica: "💡 Pense na norma principal que trata de SGSI."
+            opcoes: [
+                "Uma norma que estabelece requisitos para um Sistema de Gestão de Segurança da Informação (SGSI).",
+                "Um guia focado exclusivamente em testes de invasão e pentest para redes.",
+                "Uma lei governamental brasileira para proteção de dados pessoais (LGPD).",
+                "Um certificado técnico obrigatório para hardwares de servidores."
+            ],
+            correta: 0,
+            dica: "💡 Pense na norma principal internacional que trata de SGSI.",
+            detalhe: "A ISO 27001 define os requisitos para implementar, manter e melhorar continuamente um SGSI."
         },
         {
             pergunta: "Qual é o principal objetivo da ISO/IEC 27001?",
-            resposta: "gerenciar riscos e proteger ativos",
-            exibicaoResposta: "Estabelecer requisitos para que a organização possa gerenciar os riscos de segurança da informação e proteger seus ativos de informação.",
-            dica: "💡 Foca em gerenciar algo indesejado e blindar os bens da empresa."
+            opcoes: [
+                "Eliminar totalmente todos os ataques cibernéticos do mundo.",
+                "Gerenciar os riscos de segurança da informação e proteger os ativos de informação.",
+                "Reduzir os custos com infraestrutura de rede em empresas corporativas.",
+                "Padronizar os salários dos profissionais de tecnologia da informação."
+            ],
+            correta: 1,
+            dica: "💡 Foca em gerenciar algo indesejado e blindar os bens da empresa.",
+            detalhe: "Seu objetivo é estabelecer requisitos para que a organização gerencie riscos e proteja seus ativos."
         },
         {
             pergunta: "O que significa SGSI?",
-            resposta: "sistema de gestao de seguranca da informacao",
-            exibicaoResposta: "Sistema de Gestão de Segurança da Informação. É um sistema utilizado para estabelecer, implementar, manter e melhorar continuamente a segurança da informação.",
-            dica: "💡 É o acrônimo traduzido para o português que unifica a gestão na área."
+            opcoes: [
+                "Sistema Global de Segurança da Internet",
+                "Serviço Geral de Suporte à Informação",
+                "Sistema de Gestão de Segurança da Informação",
+                "Segurança de Grupos e Sistemas Integrados"
+            ],
+            correta: 2,
+            dica: "💡 É o acrônimo traduzido que unifica a gestão na área de segurança.",
+            detalhe: "Sistema utilizado pela organização para estabelecer, implementar, manter e melhorar continuamente a SI."
         },
         {
             pergunta: "O que significa a tríade CID?",
-            resposta: "confidencialidade integridade disponibilidade",
-            exibicaoResposta: "C = Confidencialidade (acesso restrito), I = Integridade (sem alterações indevidas), D = Disponibilidade (acesso quando necessário).",
-            dica: "💡 São os três pilares clássicos da segurança."
+            opcoes: [
+                "Confiabilidade, Integração, Disponibilidade",
+                "Confidencialidade, Integridade, Disponibilidade",
+                "Controle, Identificação, Documentação",
+                "Criptografia, Inteligência, Dados"
+            ],
+            correta: 1,
+            dica: "💡 São os três pilares clássicos e fundamentais da segurança da informação.",
+            detalhe: "C=Confidencialidade, I=Integridade, D=Disponibilidade."
         },
         {
             pergunta: "Qual é a importância da tríade CID?",
-            resposta: "principios fundamentais de protecao",
-            exibicaoResposta: "Ela representa três princípios fundamentais para impedir acessos não autorizados, evitar alterações indevidas e garantir o acesso às informações quando necessário.",
-            dica: "💡 Representa a base das diretrizes de proteção."
+            opcoes: [
+                "Impedir acessos não autorizados, evitar alterações indevidas e garantir acesso quando necessário.",
+                "Garantir que a internet da empresa nunca caia sob nenhuma hipótese.",
+                "Reduzir o tempo de resposta do suporte técnico aos usuários.",
+                "Substituir a necessidade de senhas fortes nos sistemas."
+            ],
+            correta: 0,
+            dica: "💡 Representa a base prática das diretrizes de proteção de dados.",
+            detalhe: "Representa os três princípios fundamentais para proteger as informações em todos os cenários."
         },
         {
             pergunta: "A ISO/IEC 27001 pode ser certificada?",
-            resposta: "sim",
-            exibicaoResposta: "Sim. A ISO/IEC 27001 é uma norma passível de certificação acreditada.",
-            dica: "💡 Empresas conseguem receber um selo oficial de conformidade por ela."
+            opcoes: [
+                "Não, é apenas um guia de boas práticas sem validade de auditoria.",
+                "Sim, é uma norma passível de certificação acreditada.",
+                "Apenas para empresas públicas do governo federal.",
+                "Somente se a empresa faturar mais de 10 milhões por ano."
+            ],
+            correta: 1,
+            dica: "💡 Organizações podem buscar um selo/certificado oficial por ela.",
+            detalhe: "Sim, organizações podem obter uma certificação oficial por meio de organismos acreditados."
         },
         {
             pergunta: "Qual é a diferença entre certificado e site?",
-            resposta: "certificado e documento emitido e site e local de trabalho",
-            exibicaoResposta: "Certificado é o documento emitido por um organismo de certificação. Site é um local permanente em que uma organização realiza trabalho ou serviço.",
-            dica: "💡 Um é um documento/selo e o outro refere-se ao local físico/espaço de operação."
+            opcoes: [
+                "Certificado é um vírus de computador e site é a página web.",
+                "Certificado é o documento emitido por organismo de certificação e site é o local de trabalho da organização.",
+                "Não há diferença, são sinônimos no contexto da norma.",
+                "Certificado é a senha de rede e site é o data center."
+            ],
+            correta: 1,
+            dica: "💡 Um é um documento formal e o outro refere-se ao local físico de operação.",
+            detalhe: "Certificado é o documento de conformidade. Site é o local permanente onde a organização realiza trabalho."
         },
         {
             pergunta: "O que são as NBRs relacionadas à ISO/IEC 27001 e 27002?",
-            resposta: "normas brasileiras adotadas pela abnt",
-            exibicaoResposta: "No Brasil, as normas recebem a denominação ABNT NBR ISO/IEC 27001 e 27002. A ABNT é o organismo responsável.",
-            dica: "💡 Sigla nacional reguladora de padrões."
+            opcoes: [
+                "Normas internacionais criadas exclusivamente para os Estados Unidos.",
+                "Versões brasileiras das normas adotadas e traduzidas pela ABNT.",
+                "Softwares de antivírus obrigatórios no Brasil.",
+                "Regras de tributação para empresas de tecnologia."
+            ],
+            correta: 1,
+            dica: "💡 No Brasil, elas ganham o prefixo regulado pela ABNT.",
+            detalhe: "No Brasil, recebem a denominação ABNT NBR ISO/IEC 27001 e 27002, reguladas pela ABNT."
         },
         {
             pergunta: "Qual é a importância do contexto organizacional para o SGSI?",
-            resposta: "considerar caracteristicas e particularidades da organizacao",
-            exibicaoResposta: "O SGSI deve considerar as características, necessidades, objetivos e riscos da organização. A segurança não deve ser tratada de maneira isolada.",
-            dica: "💡 Cada empresa tem sua realidade própria que deve ser respeitada."
+            opcoes: [
+                "Permite copiar o modelo exato de qualquer outra empresa concorrente.",
+                "O SGSI deve considerar características, necessidades, objetivos e riscos próprios da organização.",
+                "Garante isenção de multas em auditorias externas.",
+                "Elimina a necessidade de envolver os funcionários nas regras."
+            ],
+            correta: 1,
+            dica: "💡 Cada empresa tem sua realidade única que molda a segurança.",
+            detalhe: "O SGSI deve considerar as particularidades da organização; a segurança não deve ser tratada de forma isolada."
         },
         {
             pergunta: "Qual é a importância da alta direção na segurança da informação?",
-            resposta: "envolvimento e comprometimento",
-            exibicaoResposta: "A alta direção deve estar envolvida e comprometida, alinhando os objetivos de segurança aos objetivos estratégicos da organização.",
-            dica: "💡 O apoio precisa vir de cima para baixo na hierarquia."
+            opcoes: [
+                "A alta direção deve se envolver e comprometer, alinhando a segurança aos objetivos estratégicos.",
+                "A direção deve apenas assinar os pagamentos e delegar 100% das decisões técnicas.",
+                "A direção não precisa participar, pois a TI resolve tudo sozinha.",
+                "A direção deve focar apenas em marketing e vendas."
+            ],
+            correta: 0,
+            dica: "💡 O apoio e engajamento precisam vir do topo da hierarquia.",
+            detalhe: "O envolvimento da liderança é vital para alinhar a segurança aos rumos estratégicos do negócio."
         },
         {
             pergunta: "O que é melhoria contínua no SGSI?",
-            resposta: "processo de avaliar continuamente e implementar mudancas",
-            exibicaoResposta: "É o processo de avaliar continuamente o sistema, identificar problemas e oportunidades de melhoria e implementar mudanças para aumentar sua eficácia.",
-            dica: "💡 Ciclo constante de aperfeiçoamento."
+            opcoes: [
+                "Comprar computadores novos a cada seis meses.",
+                "O processo de avaliar continuamente o sistema, identificar falhas e implementar mudanças.",
+                "Mudar a senha de todos os funcionários toda semana.",
+                "Contratar mais funcionários para a equipe de suporte."
+            ],
+            correta: 1,
+            dica: "💡 Ciclo constante de verificação e aprimoramento.",
+            detalhe: "Processo constante de avaliação, identificação de melhorias e implementação de mudanças de eficácia."
         },
         {
             pergunta: "O que significa PDCA?",
-            resposta: "plan do check act",
-            exibicaoResposta: "P = Plan (Planejar), D = Do (Fazer), C = Check (Checar), A = Act (Agir). É o ciclo de melhoria contínua.",
-            dica: "💡 São 4 palavras em inglês que formam a sigla de gestão."
+            opcoes: [
+                "Protect, Detect, Correct, Audit",
+                "Plan, Do, Check, Act",
+                "Process, Data, Control, Access",
+                "Prevent, Define, Code, Analyze"
+            ],
+            correta: 1,
+            dica: "💡 São quatro palavras em inglês que formam o ciclo clássico de gestão.",
+            detalhe: "P=Plan (Planejar), D=Do (Fazer), C=Check (Checar), A=Act (Agir)."
         },
         {
             pergunta: "Qual é a função da ISO/IEC 27002?",
-            resposta: "fornecer diretrizes e boas praticas para controles",
-            exibicaoResposta: "Fornecer diretrizes e boas práticas para implementação dos controles de segurança da informação.",
-            dica: "💡 Serve como um catálogo de orientações práticas."
+            opcoes: [
+                "Fornecer diretrizes e boas práticas para implementação dos controles de segurança.",
+                "Punir empresas que sofrem vazamentos de dados.",
+                "Certificar diretamente os profissionais de segurança.",
+                "Definir especificações técnicas de cabos de rede."
+            ],
+            correta: 0,
+            dica: "💡 Serve como um catálogo de orientações e boas práticas.",
+            detalhe: "Fornece diretrizes e boas práticas para a implementação dos controles de segurança."
         },
         {
             pergunta: "Quantos controles existem na ISO/IEC 27002:2022?",
-            resposta: "93",
-            exibicaoResposta: "A ISO/IEC 27002:2022 possui exatamente 93 controles.",
-            dica: "💡 É um número na casa dos noventa."
+            opcoes: ["50 controles", "75 controles", "93 controles", "114 controles"],
+            correta: 2,
+            dica: "💡 É um número exato na casa dos noventa.",
+            detalhe: "A versão de 2022 da ISO/IEC 27002 possui exatamente 93 controles."
         },
         {
             pergunta: "Como os 93 controles da ISO/IEC 27002:2022 são distribuídos?",
-            resposta: "organizacionais pessoas fisicos tecnologicos",
-            exibicaoResposta: "37 controles organizacionais, 8 de pessoas, 14 físicos e 34 tecnológicos.",
-            dica: "💡 Dividem-se em 4 grandes grupos temáticos."
+            opcoes: [
+                "Organizacionais, Pessoas, Físicos, Tecnológicos",
+                "Hardware, Software, Redes, Usuários",
+                "Preventivos, Detectivos, Corretivos, Gerenciais",
+                "Internos, Externos, Locais, Remotos"
+            ],
+            correta: 0,
+            dica: "💡 Dividem-se em 4 grandes grupos temáticos estruturais.",
+            detalhe: "37 organizacionais, 8 de pessoas, 14 físicos e 34 tecnológicos."
         },
         {
             pergunta: "Qual foi uma das principais mudanças da ISO/IEC 27002:2022?",
-            resposta: "reorganizou os controles em quatro grupos tematicos",
-            exibicaoResposta: "A norma reorganizou os controles em quatro grupos temáticos e trouxe novos controles e atributos relacionados às necessidades atuais.",
-            dica: "💡 Mudança na estrutura de agrupamento e inclusão de atributos modernos."
+            opcoes: [
+                "A extinção de todos os controles físicos.",
+                "A reorganização dos controles em quatro grupos temáticos e novos atributos.",
+                "A obrigatoriedade de uso de inteligência artificial em todas as empresas.",
+                "A fusão com a norma de qualidade ISO 9001."
+            ],
+            correta: 1,
+            dica: "💡 Atualização focada em modernizar a estrutura e categorias.",
+            detalhe: "Reorganizou em 4 grupos e trouxe novos atributos adaptados às necessidades atuais de segurança."
         },
         {
             pergunta: "O que são controles de segurança da informação?",
-            resposta: "medidas utilizadas para reduzir riscos",
-            exibicaoResposta: "São medidas utilizadas para reduzir riscos e proteger as informações e os ativos da organização.",
-            dica: "💡 Barreiras ou ações protetivas aplicadas."
+            opcoes: [
+                "Medidas utilizadas para reduzir riscos e proteger ativos da organização.",
+                "Sistemas de alarme antirroubo instalados nas portas da empresa.",
+                "Relatórios de ponto eletrônico dos funcionários.",
+                "Manuais impressos guardados em arquivos mortos."
+            ],
+            correta: 0,
+            dica: "💡 Barreiras ou ações defensivas aplicadas no dia a dia.",
+            detalhe: "São medidas e barreiras implementadas para mitigar riscos e proteger informações e ativos."
         },
         {
-            pergunta: "Quais são os principais tipos de controles apresentados?",
-            resposta: "preventivos detectivos corretivos",
-            exibicaoResposta: "Controles preventivos (evitam), detectivos (identificam) e corretivos (corrigem problemas depois que acontecem).",
-            dica: "💡 Três categorias com base no momento da ação."
+            pergunta: "Quais são os principais tipos de controles apresentados no material?",
+            opcoes: [
+                "Rápidos, Médios e Lentos",
+                "Preventivos, Detectivos, Corretivos",
+                "Manuais, Automáticos e Híbridos",
+                "Públicos, Privados e Confidenciais"
+            ],
+            correta: 1,
+            dica: "💡 Três categorias baseadas no momento em que a ação protetiva ocorre.",
+            detalhe: "Preventivos (evitam), Detectivos (identificam) e Corretivos (corrigem após o evento)."
         },
         {
             pergunta: "O que é risco de segurança da informação?",
-            resposta: "possibilidade de ameaca explorar vulnerabilidade",
-            exibicaoResposta: "É a possibilidade de uma ameaça explorar uma vulnerabilidade e causar consequências negativas para a organização.",
-            dica: "💡 Combinação entre chance de ocorrência e impacto."
+            opcoes: [
+                "A certeza absoluta de que um hacker vai invadir o sistema.",
+                "A possibilidade de uma ameaça explorar uma vulnerabilidade e causar danos.",
+                "O custo financeiro para comprar licenças de antivírus.",
+                "A falta de treinamento básico dos novos estagiários."
+            ],
+            correta: 1,
+            dica: "💡 Envolve a combinação entre chance de ocorrência e impacto negativo.",
+            detalhe: "É a possibilidade de uma ameaça explorar vulnerabilidades gerando consequências negativas."
         },
         {
             pergunta: "Quais fatores são importantes para avaliar um risco?",
-            resposta: "impacto e probabilidade",
-            exibicaoResposta: "Probabilidade (chance de acontecer) e Impacto (tamanho das consequências caso aconteça).",
-            dica: "💡 Um mede o estrago e o outro a chance de suceder."
+            opcoes: [
+                "Custo e Velocidade",
+                "Impacto e Probabilidade",
+                "Tamanho e Peso",
+                "Origem e Destino"
+            ],
+            correta: 1,
+            dica: "💡 Um mede o estrago potencial e o outro a chance de acontecer.",
+            detalhe: "Probabilidade (chance de suceder) e Impacto (tamanho das consequências)."
         },
         {
             pergunta: "O que é um plano de tratamento de riscos?",
-            resposta: "planejamento das medidas que serao adotadas",
-            exibicaoResposta: "É o planejamento das medidas para tratar riscos identificados, estabelecendo controles, prazos e responsáveis.",
-            dica: "💡 Documento de ação para mitigar os riscos mapeados."
+            opcoes: [
+                "Um contrato com seguradoras internacionais.",
+                "O planejamento das medidas adotadas para tratar riscos, definindo prazos e responsáveis.",
+                "Uma lista de demissões em caso de falha de segurança.",
+                "O orçamento anual gasto em firewalls."
+            ],
+            correta: 1,
+            dica: "💡 Documento prático que define quem faz o quê e quando para mitigar riscos.",
+            detalhe: "Planejamento das medidas de mitigação, estabelecendo controles, prazos e responsáveis."
         },
         {
             pergunta: "No caso da Tech & Safe, qual foi um dos principais problemas identificados?",
-            resposta: "compartilhamento de credenciais",
-            exibicaoResposta: "O compartilhamento de credenciais, o que dificulta a identificação individual dos usuários e aumenta riscos de acesso indevido.",
-            dica: "💡 Funcionários usavam logins ou senhas de outros."
+            opcoes: [
+                "O compartilhamento de credenciais entre os usuários.",
+                "A falta de computadores modernos para os funcionários.",
+                "O uso de redes sociais durante o expediente.",
+                "A ausência de uma cafeteira na recepção."
+            ],
+            correta: 0,
+            dica: "💡 Funcionários usavam contas ou senhas de outros colegas.",
+            detalhe: "O compartilhamento dificultava a identificação individual e elevava riscos de acesso indevido."
         },
         {
             pergunta: "O que é segregação de funções?",
-            resposta: "divisao de responsabilidades",
-            exibicaoResposta: "É a divisão de responsabilidades entre diferentes pessoas ou funções para reduzir riscos de fraude, erro ou uso indevido.",
-            dica: "💡 Separar tarefas críticas para evitar que uma só pessoa controle tudo."
+            opcoes: [
+                "Separar os funcionários por departamentos em andares diferentes.",
+                "A divisão de responsabilidades para reduzir riscos de fraude ou erro.",
+                "Proibir conversas entre equipes técnicas e administrativas.",
+                "Escalonar horários de entrada e saída do trabalho."
+            ],
+            correta: 1,
+            dica: "💡 Evitar que uma única pessoa tenha poder absoluto sobre um processo crítico.",
+            detalhe: "Divisão de responsabilidades entre diferentes pessoas para evitar fraudes ou erros por privilégio excessivo."
         },
         {
             pergunta: "Qual solução foi indicada para reduzir os riscos de acesso indevido na Tech & Safe?",
-            resposta: "controles de acesso individualizados",
-            exibicaoResposta: "Implementar controles de acesso individualizados, políticas robustas, segregação de funções, MFA e monitoramento contínuo.",
-            dica: "💡 Garantir que cada um tenha seu próprio perfil e camadas extras."
+            opcoes: [
+                "Controles de acesso individualizados, políticas robustas, segregação de funções, MFA e monitoramento.",
+                "Desligar a internet da empresa permanentemente.",
+                "Permitir que todos usem a mesma senha mestre.",
+                "Contratar seguranças físicos armados para a porta da sala de servidores."
+            ],
+            correta: 0,
+            dica: "💡 Garantir identidade única, camadas extras e rastreio de atividades.",
+            detalhe: "Implementar controles individualizados, políticas, segregação, MFA e monitoramento contínuo."
         },
         {
             pergunta: "O que é MFA?",
-            resposta: "autenticacao multifator",
-            exibicaoResposta: "MFA significa autenticação multifator. É uma forma de autenticação que utiliza mais de um fator para confirmar a identidade.",
-            dica: "💡 Exigir senha + código enviado por app ou SMS."
+            opcoes: [
+                "Manutenção Física de Ativos",
+                "Autenticação Multifator",
+                "Monitoramento de Falhas e Alertas",
+                "Mecanismo Firewall Avançado"
+            ],
+            correta: 1,
+            dica: "💡 Exigir mais de uma camada para confirmar que você é realmente você.",
+            detalhe: "MFA significa Autenticação Multifator, utilizando mais de um fator para confirmar identidade."
         },
         {
             pergunta: "Quais medidas foram utilizadas no tratamento dos riscos da Tech & Safe?",
-            resposta: "perfis individuais mfa logs centralizados",
-            exibicaoResposta: "Acesso indevido (perfis individuais/segregação), Credenciais (política/MFA) e Monitoramento (logs centralizados e alertas).",
-            dica: "💡 Soluções focadas em individualidade, autenticação dupla e rastreio."
+            opcoes: [
+                "Perfis individuais/segregação, política de senhas/MFA, logs centralizados e alertas.",
+                "Troca de cadeiras, pintura das paredes e novos crachás.",
+                "Demissão de toda a diretoria executiva.",
+                "Migração para servidores analógicos de papel."
+            ],
+            correta: 0,
+            dica: "💡 Foco em individualidade de contas, dupla checagem e rastreio de logs.",
+            detalhe: "Soluções aplicadas para acesso indevido, credenciais compartilhadas e ausência de monitoramento."
         },
         {
             pergunta: "O que é uma Política de Segurança da Informação (PSI)?",
-            resposta: "conjunto de diretrizes que estabelece como proteger informacoes",
-            exibicaoResposta: "É um conjunto de diretrizes que estabelece como a organização deve proteger suas informações, sistemas e ativos.",
-            dica: "💡 O 'manual de leis' interna de segurança da empresa."
+            opcoes: [
+                "Um contrato de trabalho temporário.",
+                "Um conjunto de diretrizes que estabelece como proteger informações, sistemas e ativos.",
+                "Uma lei federal de impostos corporativos.",
+                "Um manual técnico de montagem de computadores."
+            ],
+            correta: 1,
+            dica: "💡 O 'código de conduta e regras' oficiais de segurança da empresa.",
+            detalhe: "Conjunto de diretrizes que dita como a organização protege seus ativos e dados."
         },
         {
             pergunta: "Quais temas importantes devem aparecer na PSI da Tech & Safe?",
-            resposta: "gestao de incidentes controle de acesso continuidade",
-            exibicaoResposta: "Gestão de incidentes, Controle de acesso/MFA, Classificação da informação, Segurança física, Monitoramento e Continuidade de negócios.",
-            dica: "💡 Vários tópicos cruciais de governança e proteção."
+            opcoes: [
+                "Cardápio do refeitório e regras de vestimenta casual.",
+                "Gestão de incidentes, controle de acesso/MFA, classificação da informação, monitoramento e continuidade.",
+                "Metas de vendas trimestrais e comissões.",
+                "Horários de férias coletivas."
+            ],
+            correta: 1,
+            dica: "💡 Tópicos cruciais de governança, controle e proteção de dados.",
+            detalhe: "Aborda incidentes, acessos, classificação, segurança física, auditoria e continuidade."
         },
         {
             pergunta: "Por que a PSI deve ser revisada periodicamente?",
-            resposta: "porque ameacas e necessidades mudam",
-            exibicaoResposta: "Porque as ameaças cibernéticas, as necessidades da organização e as normas de segurança podem mudar com o tempo.",
-            dica: "💡 O cenário tecnológico e as ameaças estão em constante evolução."
+            opcoes: [
+                "Porque as ameaças cibernéticas, as necessidades da organização e as normas mudam.",
+                "Para gastar o orçamento anual reservado para papelaria.",
+                "Porque os arquivos de texto expiram legalmente a cada 30 dias.",
+                "Para alterar a logomarca da empresa."
+            ],
+            correta: 0,
+            dica: "💡 O cenário tecnológico e os riscos evoluem de forma constante.",
+            detalhe: "Ameaças e necessidades mudam com o tempo; a revisão mantém a política atualizada e eficaz."
         },
         {
             pergunta: "O que é auditoria?",
-            resposta: "processo de exame cuidadoso e sistematico",
-            exibicaoResposta: "É um processo de exame cuidadoso e sistemático das atividades para verificar conformidade com o planejado e eficácia.",
-            dica: "💡 Uma verificação formal e detalhada de conformidade."
+            opcoes: [
+                "Um processo de exame sistemático para verificar conformidade e eficácia.",
+                "Uma auditoria financeira focada exclusivamente em sonegação de impostos.",
+                "Um teste de velocidade de conexão de internet.",
+                "Uma reunião semanal de feedback entre chefes e funcionários."
+            ],
+            correta: 0,
+            dica: "💡 Uma verificação formal e detalhada de conformidade com o planejado.",
+            detalhe: "Processo de exame cuidadoso para verificar se as atividades estão em conformidade e eficácia."
         },
         {
             pergunta: "Qual é a função da auditoria dentro do SGSI?",
-            resposta: "verificar se processos estao conforme planejado",
-            exibicaoResposta: "Verificar se os processos são realizados conforme planejado, identificar desvios, avaliar eficácia e encontrar melhorias.",
-            dica: "💡 Checar se o sistema está rodando nos conformes e achar falhas."
+            opcoes: [
+                "Aplicar punições corporativas imediatas aos culpados.",
+                "Verificar se processos são realizados conforme planejado, identificar desvios e oportunidades de melhoria.",
+                "Substituir o trabalho da equipe de suporte técnico.",
+                "Elaborar o orçamento financeiro anual."
+            ],
+            correta: 1,
+            dica: "💡 Checar se o sistema roda direito e encontrar brechas ou melhorias.",
+            detalhe: "Verificar se processos seguem o planejado, apontar desvios e encontrar melhorias."
         },
         {
             pergunta: "O que é a ISO 19011?",
-            resposta: "norma que fornece orientacoes para auditorias",
-            exibicaoResposta: "É uma norma que fornece orientações para auditorias de sistemas de gestão.",
-            dica: "💡 O guia padrão internacional para realizar auditorias."
+            opcoes: [
+                "Uma norma de diretrizes para auditorias de sistemas de gestão.",
+                "Uma norma de segurança física de portas e portões.",
+                "Um padrão internacional para criptografia de e-mails.",
+                "Uma diretriz de sustentabilidade ambiental."
+            ],
+            correta: 0,
+            dica: "💡 O guia oficial padrão internacional sobre como auditar.",
+            detalhe: "Norma que fornece diretrizes e orientações para a realização de auditorias de sistemas de gestão."
         },
         {
             pergunta: "Quais são as principais etapas de uma auditoria?",
-            resposta: "preparo conducao relatorio acompanhamento",
-            exibicaoResposta: "1. Preparo/Início, 2. Condução das atividades, 3. Relatório, 4. Acompanhamento.",
-            dica: "💡 Sequência desde o planejamento até o pós-auditoria."
+            opcoes: [
+                "Início, Desenvolvimento, Conclusão e Entrega",
+                "Preparo/Início, Condução das atividades, Relatório, Acompanhamento",
+                "Planejamento, Venda, Cobrança e Pós-venda",
+                "Análise, Codificação, Teste e Deploy"
+            ],
+            correta: 1,
+            dica: "💡 Sequência lógica que vai desde o planejamento até o pós-auditoria.",
+            detalhe: "1. Preparo/Início, 2. Condução, 3. Relatório, 4. Acompanhamento."
         },
         {
             pergunta: "Qual é a diferença entre auditoria interna e externa?",
-            resposta: "interna e realizada pela propria organizacao e externa por terceiros",
-            exibicaoResposta: "Auditoria interna é realizada pela própria organização; externa é realizada por uma parte externa à organização.",
-            dica: "💡 Muda quem executa a verificação (dentro vs fora da empresa)."
+            opcoes: [
+                "Auditoria interna é feita pela própria organização; externa é realizada por parte externa.",
+                "Auditoria interna é online; externa é presencial.",
+                "Auditoria interna é barata; externa é gratuita.",
+                "Não há diferença técnica, apenas o nome do auditor."
+            ],
+            correta: 0,
+            dica: "💡 Quem executa a verificação define o tipo (dentro vs fora da empresa).",
+            detalhe: "Interna: realizada pela própria empresa. Externa: realizada por uma entidade independente externa."
         },
         {
             pergunta: "O que são evidências de auditoria?",
-            resposta: "informacoes verificaveis utilizadas pelo auditor",
-            exibicaoResposta: "São informações verificáveis utilizadas pelo auditor (documentos, registros, entrevistas, observações) para avaliar os critérios.",
-            dica: "💡 As 'provas' coletadas para embasar a auditoria."
+            opcoes: [
+                "Provas criminais enviadas à polícia civil.",
+                "Informações verificáveis (documentos, registros, entrevistas, observações) usadas pelo auditor.",
+                "Opiniões subjetivas dos funcionários sobre a chefia.",
+                "Cópias de senhas de acesso administrativo."
+            ],
+            correta: 1,
+            dica: "💡 As 'provas' concretas coletadas para embasar a auditoria.",
+            detalhe: "Informações verificáveis utilizadas para avaliar se os critérios da auditoria estão sendo atendidos."
         }
     ];
 
     let indiceAtual = 0;
     let pontuacao = 0;
 
-    function normalizar(texto) {
-        return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-    }
-
     function carregarPergunta() {
         if (indiceAtual >= perguntas.length) {
             document.getElementById("quiz-container").innerHTML = `
                 <h2>Fim do Quiz! 🎉</h2>
                 <p style="font-size: 18px; margin: 20px 0;">Sua pontuação final: <strong>${pontuacao}</strong> de <strong>${perguntas.length}</strong></p>
-                <button onclick="location.reload()">Reiniciar Quiz</button>
+                <button id="btn-proximo" style="display:block;" onclick="location.reload()">Reiniciar Quiz</button>
             `;
             return;
         }
@@ -357,45 +562,46 @@
         document.getElementById("contador").innerText = `Pergunta ${indiceAtual + 1} de ${perguntas.length}`;
         document.getElementById("question").innerText = q.pergunta;
         document.getElementById("dica-box").innerHTML = q.dica;
-        document.getElementById("resposta-usuario").value = "";
         
-        let feedbackArea = document.getElementById("feedback-area");
-        feedbackArea.innerHTML = "";
-        feedbackArea.className = "";
-        
-        document.getElementById("input-area").style.display = "block";
+        let opcoesArea = document.getElementById("opcoes-area");
+        opcoesArea.innerHTML = "";
+
+        q.opcoes.forEach((opcao, index) => {
+            let btn = document.createElement("button");
+            btn.className = "btn-opcao";
+            btn.innerText = opcao;
+            btn.onclick = () => verificarResposta(index);
+            opcoesArea.appendChild(btn);
+        });
+
+        document.getElementById("feedback-area").innerHTML = "";
+        document.getElementById("feedback-area").className = "";
         document.getElementById("btn-proximo").style.display = "none";
-        document.getElementById("resposta-usuario").focus();
     }
 
-    function verificarResposta() {
-        let inputUsuario = document.getElementById("resposta-usuario").value;
-        if (!inputUsuario.trim()) {
-            alert("Por favor, digite uma resposta!");
-            return;
-        }
-
+    function verificarResposta(escolhaUsuario) {
         let q = perguntas[indiceAtual];
-        let usuarioNorm = normalizar(inputUsuario);
-        let corretaNorm = normalizar(q.resposta);
-
-        // Verifica se a resposta contém palavras-chave essenciais
-        let acerto = usuarioNorm.split(" ").some(palavra => palavra.length > 3 && corretaNorm.includes(palavra));
-        // Ou se for muito curta e exata
-        if (corretaNorm.includes(usuarioNorm) && usuarioNorm.length > 2) {
-            acerto = true;
-        }
+        let botoes = document.querySelectorAll(".btn-opcao");
+        
+        // Desativar todos os botões após a escolha
+        botoes.forEach(b => b.disabled = true);
 
         let feedbackArea = document.getElementById("feedback-area");
-        document.getElementById("input-area").style.display = "none";
 
-        if (acerto) {
+        if (escolhaUsuario === q.correta) {
             pontuacao++;
+            botoes[escolhaUsuario].style.background = "rgba(0, 255, 0, 0.3)";
+            botoes[escolhaUsuario].style.borderColor = "#00FF00";
             feedbackArea.className = "feedback correto";
-            feedbackArea.innerHTML = `✅ ACERTOU!<div class="detalhe-texto"><strong>Resposta oficial:</strong> ${q.exibicaoResposta}</div>`;
+            feedbackArea.innerHTML = `✅ ACERTOU!<div class="detalhe-texto"><strong>Explicação:</strong> ${q.detalhe}</div>`;
         } else {
+            botoes[escolhaUsuario].style.background = "rgba(255, 69, 0, 0.3)";
+            botoes[escolhaUsuario].style.borderColor = "#FF4500";
+            botoes[q.correta].style.background = "rgba(0, 255, 0, 0.3)";
+            botoes[q.correta].style.borderColor = "#00FF00";
+            
             feedbackArea.className = "feedback errado";
-            feedbackArea.innerHTML = `❌ ERROU!<div class="detalhe-texto"><strong>Resposta correta:</strong> ${q.exibicaoResposta}</div>`;
+            feedbackArea.innerHTML = `❌ ERROU!<div class="detalhe-texto"><strong>Resposta correta:</strong> ${q.opcoes[q.correta]}<br><br><strong>Explicação:</strong> ${q.detalhe}</div>`;
         }
 
         document.getElementById("btn-proximo").style.display = "block";
@@ -406,13 +612,6 @@
         indiceAtual++;
         carregarPergunta();
     }
-
-    // Permitir apertar Enter para enviar
-    document.getElementById("resposta-usuario").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            verificarResposta();
-        }
-    });
 
     carregarPergunta();
 </script>
