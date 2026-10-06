@@ -1,6 +1,6 @@
 # Quiz de Normas de Segurança da Informação
 
-Um aplicativo web interativo e leve desenvolvido em **HTML, CSS e JavaScript** com tema escuro (fundo preto), focado em fixar o conhecimento sobre **ISO/IEC 27001**, **ISO/IEC 27002**, **tríade CID**, **gestão de riscos** e **auditoria**.
+Um aplicativo web interativo e leve desenvolvido em **HTML, CSS e JavaScript** com tema escuro, focado em fixar o conhecimento sobre **ISO/IEC 27001**, **ISO/IEC 27002**, **tríade CID**, **gestão de riscos** e **auditoria**.
 
 ---
 
